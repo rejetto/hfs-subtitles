@@ -7,7 +7,7 @@
         const subEntry = HFS.state.list?.find(x =>
             SUPPORTED_EXTS.includes(x.ext) && x.uri.startsWith(folder) && getNoExt(x).startsWith(noExt) )
         if (!subEntry) return
-        const title = getNoExt(subEntry).slice(noExt.length).replace(/^[-. ]+/, '')
+        const title = getNoExt(subEntry).slice(noExt.length).replace(/^[-. ]+/, '') || "unknown"
         const sub = { title, lang: title }
         params.Component = props =>
             HFS.h(Component, props,
