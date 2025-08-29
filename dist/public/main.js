@@ -4,19 +4,19 @@
         const { entry, Component } = params
         const folder = entry.uri.slice(0, -entry.name.length)
         const noExt = getNoExt(entry)
-        const subEntry = HFS.state.list?.find(x =>
+        const subEntries = HFS.state.list?.filter(x =>
             SUPPORTED_EXTS.includes(x.ext) && x.uri.startsWith(folder) && getNoExt(x).startsWith(noExt) )
-        if (!subEntry) return
-        const title = getNoExt(subEntry).slice(noExt.length).replace(/^[-. ]+/, '') || "unknown"
-        const sub = { title, lang: title }
+        if (!subEntries?.length) return
         params.Component = props =>
             HFS.h(Component, props,
-                HFS.h('track', {
-                    label: sub.title,
-                    kind: 'subtitles',
-                    srcLang: sub.lang,
-                    src: sub.idx !== undefined ? entry.uri + '?get=subtitle&idx=' + sub.idx // embedded
-                        : subEntry.uri + (subEntry.ext === 'vtt' ? '' : '?get=vtt'), // external file
+                subEntries.map(e => {
+                    const title = getNoExt(e).slice(noExt.length).replace(/^[-. ]+/, '') || "unknown"
+                    return HFS.h('track', {
+                        label: title,
+                        kind: 'subtitles',
+                        srcLang: title,
+                        src: e.uri + (e.ext === 'vtt' ? '' : '?get=vtt'), // external file
+                    })
                 }) )
 
         function getNoExt(entry) {

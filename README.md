@@ -2,7 +2,9 @@
 
 HFS plugin to load srt/vtt subtitles showing videos, if supported by your browser.
 
-The subtitles file is automatically loaded if it has the same name of the video file, and is in the same folder or a sub-folder.
+The subtitle file is automatically loaded if it has the same name of the video file, and is in the same folder or a sub-folder.
+
+If you installed plugin "unsupported-videos", be sure to have version 0.23 or greater.
 
 On Chrome click the 3-dot button
 
