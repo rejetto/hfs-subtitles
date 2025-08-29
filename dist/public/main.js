@@ -1,5 +1,5 @@
 "use strict";{
-    const SUPPORTED_EXTS = ['srt', 'vtt']
+    const SUPPORTED_EXTS = ['srt', 'vtt', 'dfxp', 'scc', 'ttml', 'ssa', 'ass']
     const {h, React} = HFS
     HFS.onEvent('fileShow', params => {
         const { entry, Component } = params

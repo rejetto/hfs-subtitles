@@ -1,8 +1,9 @@
 # HFS Subtitles
 
-HFS plugin to load srt/vtt subtitles showing videos, if supported by your browser.
+HFS plugin to load subtitles showing videos, if supported by your browser.
+Supported formats: dfxp, scc, srt, ttml, vtt, ssa, ass.
 
-The subtitle file is automatically loaded if it has the same name of the video file, and is in the same folder or a sub-folder.
+The subtitle file is automatically loaded if it has the name starting as the video file and is in the same folder or a subfolder.
 
 If you installed plugin "unsupported-videos", be sure to have version 0.23 or greater.
 
