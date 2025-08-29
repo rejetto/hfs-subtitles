@@ -1,5 +1,5 @@
 exports.version = 0.5
-exports.description = "load srt/vtt subtitles showing videos"
+exports.description = "load srt/vtt subtitles showing videos. The subtitles file is automatically loaded if it has the same name of the video file."
 exports.apiRequired = 12.9
 exports.repo = "rejetto/hfs-subtitles"
 exports.frontend_js = "main.js"
