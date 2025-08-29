@@ -7,35 +7,70 @@
         const folder = entry.uri.slice(0, -entry.name.length)
         const noExt = getNoExt(entry)
         const subEntries = HFS.state.list?.filter(x =>
-            SUPPORTED_EXTS.includes(x.ext) && x.uri.startsWith(folder) && getNoExt(x).startsWith(noExt) )
+            SUPPORTED_EXTS.includes(x.ext) && x.uri.startsWith(folder) && getNoExt(x).startsWith(noExt)
+            && Object.assign(x, { _title: getNoExt(x).slice(noExt.length).replace(/^[-. ]+/, '') || "unknown" }) )
         const customLabel = HFS.t("Enter link to subtitles")
-        params.Component = props => {
-            const [custom, setCustom]  = React.useState()
-            const n = (subEntries?.length || 0) + (custom ? 1 : 0)
+        const btnStyle = { fontSize: 'small' }
+        let customIdx = 0
+        params.Component = React.forwardRef((props, ref) => {
+            const [subs, setSubs] = React.useState(() =>
+                subEntries?.map(e => ({ label: e._title, src: e.uri + (e.ext === 'vtt' ? '' : '?get=vtt') }) || []))
+            const ref2 = React.useRef()
             return h(React.Fragment, {},
-                h(Component, props,
-                    custom && h('track', {
-                        kind: 'subtitles', label: "custom", srcLang: "custom", default: true,
-                        src: custom + (!custom.endsWith('srt') ? '' : '?get=vtt'),
-                    }),
-                    subEntries?.map(e => {
-                        const title = getNoExt(e).slice(noExt.length).replace(/^[-. ]+/, '') || "unknown"
-                        return h('track', { key: title,
-                            kind: 'subtitles', srcLang: title, label: title,
-                            src: e.uri + (e.ext === 'vtt' ? '' : '?get=vtt'),
-                        })
-                    }) ),
-                n > 0 && HFS.t("Subtitles found: {n}", { n }),
-                h('button', {
-                    style: { fontSize: 'small' },
-                    onClick() {
-                        HFS.dialogLib.promptDialog(customLabel, { value: custom }).then(x =>
-                            x !== undefined && setCustom(x))
+                h(Component, {
+                    ...props,
+                    ref(el) {
+                        if (ref) ref.current = el // update it
+                        ref2.current = el
+                        if (!el || el._change_installed) return
+                        el.textTracks.addEventListener('change', forceRender)
+                        el._change_installed = true
                     }
-                }, customLabel)
+                },
+                    subs.map((x, i) =>
+                        h('track', { key: i, kind: 'subtitles', srcLang: x.label, ...x }) )
+                ),
+                h('div', {
+                    style: {
+                        display: 'flex', gap: '.3em .5em', flexWrap: 'wrap', justifyContent: 'center',
+                        padding: '.5em 1em', backgroundColor: 'var(--bg)',
+                    }
+                },
+                    subs.map((e, i) =>
+                        h(HFS.Btn, {
+                            key: i,
+                            style: btnStyle,
+                            label: HFS.t("Sub {label}", e),
+                            toggled: ref2.current?.textTracks[i]?.mode === 'showing',
+                            onClick: () => enable(i)
+                        })),
+                    h(HFS.Btn, {
+                        style: btnStyle,
+                        label: customLabel,
+                        async onClick() {
+                            const s = await HFS.dialogLib.promptDialog(customLabel)
+                            if (!s) return
+                            setSubs(was => [ ...was, {
+                                default: true,
+                                label: "custom " + ++customIdx,
+                                src: s + (!s.endsWith('srt') ? '' : '?get=vtt')
+                            }])
+                        }
+                    })
+                ),
             )
-        }
-        params.Component.hfs_show_video = true // tell others that we are still a video
+            params.Component.hfs_show_video = true // tell others that we are still a video
+
+            function enable(idx) {
+                const t = ref2.current.textTracks[idx]
+                t.mode = t.mode === 'showing' ? 'hidden' : 'showing'
+                forceRender()
+            }
+
+            function forceRender() {
+                setSubs(was => [...was])
+            }
+        })
 
         function getNoExt(entry) {
             return entry.name.slice(0, -entry.ext.length-1).toLowerCase()
