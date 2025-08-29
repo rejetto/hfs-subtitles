@@ -3,7 +3,7 @@
     const {h, React} = HFS
     HFS.onEvent('fileShow', params => {
         const { entry, Component } = params
-        if (Component !== HFS.fileShowComponents.Video & !Component?.hfs_show_video) return
+        if (Component !== HFS.fileShowComponents.Video && !Component?.hfs_show_video) return
         const folder = entry.uri.slice(0, -entry.name.length)
         const noExt = getNoExt(entry)
         const subEntries = HFS.state.list?.filter(x =>
@@ -11,6 +11,7 @@
         const customLabel = HFS.t("Enter link to subtitles")
         params.Component = props => {
             const [custom, setCustom]  = React.useState()
+            const n = (subEntries?.length || 0) + (custom ? 1 : 0)
             return h(React.Fragment, {},
                 h(Component, props,
                     custom && h('track', {
@@ -24,7 +25,7 @@
                             src: e.uri + (e.ext === 'vtt' ? '' : '?get=vtt'),
                         })
                     }) ),
-                subEntries?.length > 0 && HFS.t("Subtitles found: {n}", { n: subEntries?.length }),
+                n > 0 && HFS.t("Subtitles found: {n}", { n }),
                 h('button', {
                     style: { fontSize: 'small' },
                     onClick() {

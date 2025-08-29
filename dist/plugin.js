@@ -1,8 +1,9 @@
-exports.version = 0.71
+exports.version = 0.72
 exports.description = "load subtitles showing videos. The subtitles file is automatically loaded if it has the same name of the video file."
 exports.apiRequired = 12.9
 exports.repo = "rejetto/hfs-subtitles"
 exports.frontend_js = "main.js"
+exports.afterPlugin = 'unsupported-videos'
 exports.init = api => {
     const { convert } = api.require(__dirname +'/subtitle-converter.bundle.js')
     return {
