@@ -3,6 +3,7 @@
     const {h, React} = HFS
     HFS.onEvent('fileShow', params => {
         const { entry, Component } = params
+        if (Component !== HFS.fileShowComponents.Video & !Component?.hfs_show_video) return
         const folder = entry.uri.slice(0, -entry.name.length)
         const noExt = getNoExt(entry)
         const subEntries = HFS.state.list?.filter(x =>
@@ -33,6 +34,7 @@
                 }, customLabel)
             )
         }
+        params.Component.hfs_show_video = true // tell others that we are still a video
 
         function getNoExt(entry) {
             return entry.name.slice(0, -entry.ext.length-1).toLowerCase()

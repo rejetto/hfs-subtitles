@@ -1,4 +1,4 @@
-exports.version = 0.7
+exports.version = 0.71
 exports.description = "load subtitles showing videos. The subtitles file is automatically loaded if it has the same name of the video file."
 exports.apiRequired = 12.9
 exports.repo = "rejetto/hfs-subtitles"
