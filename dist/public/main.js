@@ -1,23 +1,38 @@
 "use strict";{
     const SUPPORTED_EXTS = ['srt', 'vtt', 'dfxp', 'scc', 'ttml', 'ssa', 'ass']
-    const {h, React} = HFS
+    const search = SUPPORTED_EXTS.map(x => `*.${x}`).join('|')
+    const {h, React, _} = HFS
     HFS.onEvent('fileShow', params => {
         const { entry, Component } = params
         if (Component !== HFS.fileShowComponents.Video && !Component?.hfs_show_video) return
-        let folder = entry.uri
-        const i = folder.lastIndexOf('/')
+        let folderUri = entry.uri
+        const i = folderUri.lastIndexOf('/')
         if (i > 0)
-            folder = folder.slice(0, i)
+            folderUri = folderUri.slice(0, i)
         const noExt = getNoExt(entry)
         const subEntries = HFS.state.list?.filter(x =>
-            SUPPORTED_EXTS.includes(x.ext) && x.uri.startsWith(folder) && getNoExt(x).startsWith(noExt)
-            && Object.assign(x, { _title: getNoExt(x).slice(noExt.length).replace(/^[-. ]+/, '') || "unknown" }) )
+            SUPPORTED_EXTS.includes(x.ext) && x.uri.startsWith(folderUri) && getNoExt(x).startsWith(noExt) )
+        // search for more subs, both useful for subfolders and in case the show was started from a partial list
+        const req = HFS.apiCall('get_file_list', { uri: folderUri, search }).then(res =>
+            res.list.map(x => mapEntry(new HFS.DirEntry(x.n, x))))
+
+        function mapEntry(e) {
+            let label = getNoExt(e)
+            if (label.startsWith(noExt))
+                label = label.slice(noExt.length)
+            label = label.replace(/^[-. ]+/, '')
+            label ||= "unknown"
+            return { label, src: e.uri + (e.ext === 'vtt' ? '' : '?get=vtt') }
+        }
+
         const customLabel = HFS.t("Enter link to subtitles")
         const btnStyle = { fontSize: 'small' }
         let customIdx = 0
         params.Component = React.forwardRef((props, ref) => {
-            const [subs, setSubs] = React.useState(() =>
-                subEntries?.map(e => ({ label: e._title, src: e.uri + (e.ext === 'vtt' ? '' : '?get=vtt') }) || []))
+            const [subs, setSubs] = React.useState(() => subEntries?.map(mapEntry) || [])
+            React.useEffect(() => { // copy new subs to the state, only if not already present
+                req.then(res => setSubs(was => [...was, ...res.filter(x => !_.some(was, { src: x.src }))]))
+            }, [])
             const ref2 = React.useRef()
             return h(React.Fragment, {},
                 h(Component, {
