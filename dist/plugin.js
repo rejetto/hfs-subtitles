@@ -1,4 +1,4 @@
-exports.version = 0.8
+exports.version = 0.81
 exports.description = "load subtitles showing videos. The subtitles file is automatically loaded if it has the same name of the video file."
 exports.apiRequired = 12.9
 exports.repo = "rejetto/hfs-subtitles"
@@ -8,6 +8,7 @@ exports.init = api => {
     const { convert } = api.require(__dirname +'/subtitle-converter.bundle.js')
     return {
         middleware: ctx => async () => {
+            if (!ctx.body) return // in case of 304
             if (ctx.query.get !== 'vtt') return
             const s = await api.misc.stream2string(ctx.body)
             ctx.type = 'vtt'
