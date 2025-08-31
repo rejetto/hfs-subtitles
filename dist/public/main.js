@@ -4,7 +4,10 @@
     HFS.onEvent('fileShow', params => {
         const { entry, Component } = params
         if (Component !== HFS.fileShowComponents.Video && !Component?.hfs_show_video) return
-        const folder = entry.uri.slice(0, -entry.name.length)
+        let folder = entry.uri
+        const i = folder.lastIndexOf('/')
+        if (i > 0)
+            folder = folder.slice(0, i)
         const noExt = getNoExt(entry)
         const subEntries = HFS.state.list?.filter(x =>
             SUPPORTED_EXTS.includes(x.ext) && x.uri.startsWith(folder) && getNoExt(x).startsWith(noExt)
