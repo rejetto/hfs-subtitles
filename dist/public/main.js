@@ -23,7 +23,6 @@
             return { label, src: e.uri + (e.ext === 'vtt' ? '' : '?get=vtt') }
         }
 
-        const customLabel = HFS.t("Enter link to subtitles")
         const btnStyle = { fontSize: 'small' }
         let customIdx = 0
         params.Component = React.forwardRef((props, ref) => {
@@ -46,7 +45,9 @@
                         was.concat(res.filter(x => !_.some(was, { src: x.src }))) ))
             }, [])
             const ref2 = React.useRef()
+            const [font, setFont] = React.useState(100)
             return h(React.Fragment, {},
+                h('style', {}, `video::cue { font-size: ${font}% }`),
                 h(Component, {
                     ...props,
                     ref(el) {
@@ -62,23 +63,24 @@
                 ),
                 h('div', {
                     style: {
-                        display: 'flex', gap: '.3em .5em', flexWrap: 'wrap', justifyContent: 'center',
+                        display: 'flex', gap: '.3em .5em', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center',
                         padding: '.5em 1em', backgroundColor: 'var(--bg)',
                     }
                 },
+                    h('div', {}, HFS.t("Subtitles")),
                     subs.map((e, i) =>
                         h(HFS.Btn, {
                             key: i,
                             style: btnStyle,
-                            label: HFS.t("Sub {label}", e),
+                            label: e.label,
                             toggled: ref2.current?.textTracks[i]?.mode === 'showing',
                             onClick: () => enable(i)
                         })),
                     h(HFS.Btn, {
                         style: btnStyle,
-                        label: customLabel,
+                        label: HFS.t("Add..."),
                         async onClick() {
-                            const s = await HFS.dialogLib.promptDialog(customLabel)
+                            const s = await HFS.dialogLib.promptDialog(HFS.t("Enter http link to subtitles"))
                             if (!s) return
                             setSubs(was => [ ...was, {
                                 default: true,
@@ -86,10 +88,16 @@
                                 src: s + (!s.endsWith('srt') ? '' : '?get=vtt')
                             }])
                         }
-                    })
+                    }),
+                    h(HFS.Btn, { style: btnStyle, label: '+', onClick: () => changeFont(+1) }),
+                    h(HFS.Btn, { style: btnStyle, label: '–', onClick: () => changeFont(-1) }),
                 ),
             )
             params.Component.hfs_show_video = true // tell others that we are still a video
+
+            function changeFont(dir) {
+                setFont(x => x + dir * 10)
+            }
 
             function enable(idx) {
                 const t = ref2.current.textTracks[idx]

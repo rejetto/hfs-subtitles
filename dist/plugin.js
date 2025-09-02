@@ -1,4 +1,4 @@
-exports.version = 1.1
+exports.version = 1.2
 exports.description = "load subtitles showing videos. The subtitles file is automatically loaded if it has the same name of the video file."
 exports.apiRequired = 12.9
 exports.repo = "rejetto/hfs-subtitles"
@@ -6,6 +6,7 @@ exports.frontend_js = "main.js"
 exports.frontend_css = "style.css"
 exports.afterPlugin = 'unsupported-videos' // or we'll skip those extensions not supported directly by hfs
 exports.changelog = [
+    { "version": 1.2, "message": "Font zoom buttons" },
     { "version": 1.1, "message": "Support embedded subtitles" },
     { "version": 1.0, "message": "Support non-utf8 subtitles" },
     { "version": 0.9, "message": "Search subtitles in subfolders" }
