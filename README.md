@@ -7,7 +7,7 @@ HFS plugin to load subtitles when you click "show" on a video.
 The subtitles are
 - searched in separate files if they have the name starting as the video file
 - you can enter an http link to any subtitle file
-- searched inside the video file, but only if you configure the plugin to use ffmpeg (a separate program)
+- searched inside the video file (ffmpeg is required, please configure the plugin)
 
 If you installed plugin "unsupported-videos", be sure to have version 0.24 or greater.
 
