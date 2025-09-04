@@ -5,7 +5,7 @@
     const cache = {}
     HFS.onEvent('fileShow', params => {
         const { entry, Component } = params
-        if (Component !== HFS.fileShowComponents.Video && !Component?.hfs_show_video) return
+        if (!HFS.isVideoComponent(Component)) return
         let folderUri = entry.uri
         const i = folderUri.lastIndexOf('/')
         if (i > 0)
@@ -25,7 +25,7 @@
 
         const btnStyle = { fontSize: 'small' }
         let customIdx = 0
-        params.Component = React.forwardRef((props, ref) => {
+        params.Component = HFS.markVideoComponent(React.forwardRef((props, ref) => {
             const [subs, setSubs] = React.useState(() => subEntries?.map(mapEntry) || [])
             React.useEffect(() => { // copy new subs to the state, only if not already present
                 const reqs = cache[entry.uri] ||= [
@@ -93,7 +93,6 @@
                     h(HFS.Btn, { style: btnStyle, label: '–', onClick: () => changeFont(-1) }),
                 ),
             )
-            params.Component.hfs_show_video = true // tell others that we are still a video
 
             function changeFont(dir) {
                 setFont(x => x + dir * 10)
@@ -108,7 +107,7 @@
             function forceRender() {
                 setSubs(was => [...was])
             }
-        })
+        }))
 
         function getNoExt(entry) {
             return entry.name.slice(0, -entry.ext.length-1).toLowerCase()
