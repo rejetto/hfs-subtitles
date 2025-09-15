@@ -28,7 +28,7 @@
         params.Component = HFS.markVideoComponent(React.forwardRef((props, ref) => {
             const [subs, setSubs] = React.useState(() => subEntries?.map(mapEntry) || [])
             React.useEffect(() => { // copy new subs to the state, only if not already present
-                const reqs = cache[entry.uri] ||= [
+                const [listReq, embeddedReq] = cache[entry.uri] ||= [
                     // search for more subs, both useful for subfolders and in case the show was started from a partial list
                     HFS.apiCall('get_file_list', { uri: folderUri, search }).then(res =>
                         res.list.map(x => mapEntry(new HFS.DirEntry(x.n, x)))),
@@ -40,9 +40,14 @@
                             src: entry.uri + '?get=subtitles&idx=' + i,
                         })))
                 ]
-                for (const req of reqs)
-                    req.then(res => setSubs(was =>
-                        was.concat(res.filter(x => !_.some(was, { src: x.src }))) ))
+                embeddedReq.then(async embeddedOnes => {
+                    const listOnes = await listReq
+                    const listMatching = listOnes.filter(e => getNoExt(e).startsWith(noExt))
+                    const onlyUseMatching = embeddedOnes.length || listMatching.length
+                    const toAdd = embeddedOnes.concat(onlyUseMatching ? listMatching : listOnes)
+                    setSubs(was =>
+                        was.concat(toAdd.filter(x => !_.some(was, { src: x.src }))) ) // only if not already present
+                })
             }, [])
             const ref2 = React.useRef()
             const [font, setFont] = React.useState(100)
