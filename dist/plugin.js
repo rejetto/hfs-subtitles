@@ -1,4 +1,4 @@
-exports.version = 1.32
+exports.version = 1.33
 exports.description = "load subtitles showing videos. The subtitles file is automatically loaded if it has the same name of the video file."
 exports.apiRequired = 12.91 // HFS.markVideoComponent
 exports.repo = "rejetto/hfs-subtitles"
@@ -6,6 +6,7 @@ exports.frontend_js = "main.js"
 exports.frontend_css = "style.css"
 exports.afterPlugin = 'unsupported-videos' // or we'll skip those extensions not supported directly by hfs
 exports.changelog = [
+    { "version": 1.33, "message": "Don't show +/- buttons if there are no subtitles" },
     { "version": 1.32, "message": "Fix: sometimes too many subtitles were loaded" },
     { "version": 1.31, "message": "Compatibility with future HFS" },
     { "version": 1.3, "message": "Several fixes" },

@@ -94,8 +94,8 @@
                             }])
                         }
                     }),
-                    h(HFS.Btn, { style: btnStyle, label: '+', onClick: () => changeFont(+1) }),
-                    h(HFS.Btn, { style: btnStyle, label: '–', onClick: () => changeFont(-1) }),
+                    subs.length > 0 && h(HFS.Btn, { style: btnStyle, label: '+', onClick: () => changeFont(+1) }),
+                    subs.length > 0 && h(HFS.Btn, { style: btnStyle, label: '–', onClick: () => changeFont(-1) }),
                 ),
             )
 
